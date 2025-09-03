@@ -15,25 +15,20 @@ func NewProductHandler(s service.ProductServiceInterface) *ProductHandler {
     return &ProductHandler{Service: s}
 }
 
-// GetProducts handles GET /products
 func (h *ProductHandler) GetProducts(w http.ResponseWriter, r *http.Request) {
     products, err := h.Service.GetProducts()
     if err != nil {
         http.Error(w, err.Error(), http.StatusInternalServerError)
         return
     }
-
     w.Header().Set("Content-Type", "application/json")
-    if err := json.NewEncoder(w).Encode(products); err != nil {
-        http.Error(w, err.Error(), http.StatusInternalServerError)
-    }
+    json.NewEncoder(w).Encode(products)
 }
 
-// CreateProduct handles POST /products
 func (h *ProductHandler) CreateProduct(w http.ResponseWriter, r *http.Request) {
     var product domain.Product
     if err := json.NewDecoder(r.Body).Decode(&product); err != nil {
-        http.Error(w, "invalid request body", http.StatusBadRequest)
+        http.Error(w, err.Error(), http.StatusBadRequest)
         return
     }
 
@@ -43,8 +38,5 @@ func (h *ProductHandler) CreateProduct(w http.ResponseWriter, r *http.Request) {
     }
 
     w.Header().Set("Content-Type", "application/json")
-    w.WriteHeader(http.StatusCreated) // 201 Created
-    if err := json.NewEncoder(w).Encode(product); err != nil {
-        http.Error(w, err.Error(), http.StatusInternalServerError)
-    }
+    json.NewEncoder(w).Encode(product)
 }
