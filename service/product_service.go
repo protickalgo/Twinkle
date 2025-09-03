@@ -1,7 +1,9 @@
 package service
 
-import "twinkle/domain"
-import "twinkle/repository"
+import (
+    "twinkle/domain"
+    "twinkle/repository"
+)
 
 type ProductServiceInterface interface {
     GetProducts() ([]domain.Product, error)
@@ -12,8 +14,8 @@ type ProductService struct {
     Repo repository.ProductRepoInterface
 }
 
-func NewProductService(repo repository.ProductRepoInterface) ProductServiceInterface {
-    return &ProductService{Repo: repo}
+func NewProductService(r repository.ProductRepoInterface) ProductServiceInterface {
+    return &ProductService{Repo: r}
 }
 
 func (s *ProductService) GetProducts() ([]domain.Product, error) {

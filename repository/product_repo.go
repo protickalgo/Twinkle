@@ -18,9 +18,10 @@ func NewProductRepo(db *gorm.DB) ProductRepoInterface {
     return &ProductRepo{DB: db}
 }
 
+// GetAll excludes the template product
 func (r *ProductRepo) GetAll() ([]domain.Product, error) {
     var products []domain.Product
-    if err := r.DB.Find(&products).Error; err != nil {
+    if err := r.DB.Where("name <> ?", "Add your name in the body").Find(&products).Error; err != nil {
         return nil, err
     }
     return products, nil
