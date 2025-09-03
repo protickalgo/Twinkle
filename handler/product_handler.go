@@ -3,8 +3,6 @@ package handler
 import (
     "encoding/json"
     "net/http"
-    // "strconv"
-    // "github.com/gorilla/mux"
     "twinkle/domain"
     "twinkle/service"
 )
@@ -17,20 +15,25 @@ func NewProductHandler(s service.ProductServiceInterface) *ProductHandler {
     return &ProductHandler{Service: s}
 }
 
+// GetProducts handles GET /products
 func (h *ProductHandler) GetProducts(w http.ResponseWriter, r *http.Request) {
     products, err := h.Service.GetProducts()
     if err != nil {
         http.Error(w, err.Error(), http.StatusInternalServerError)
         return
     }
+
     w.Header().Set("Content-Type", "application/json")
-    json.NewEncoder(w).Encode(products)
+    if err := json.NewEncoder(w).Encode(products); err != nil {
+        http.Error(w, err.Error(), http.StatusInternalServerError)
+    }
 }
 
+// CreateProduct handles POST /products
 func (h *ProductHandler) CreateProduct(w http.ResponseWriter, r *http.Request) {
     var product domain.Product
     if err := json.NewDecoder(r.Body).Decode(&product); err != nil {
-        http.Error(w, err.Error(), http.StatusBadRequest)
+        http.Error(w, "invalid request body", http.StatusBadRequest)
         return
     }
 
@@ -40,5 +43,8 @@ func (h *ProductHandler) CreateProduct(w http.ResponseWriter, r *http.Request) {
     }
 
     w.Header().Set("Content-Type", "application/json")
-    json.NewEncoder(w).Encode(product)
+    w.WriteHeader(http.StatusCreated) // 201 Created
+    if err := json.NewEncoder(w).Encode(product); err != nil {
+        http.Error(w, err.Error(), http.StatusInternalServerError)
+    }
 }
